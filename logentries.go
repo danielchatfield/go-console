@@ -2,6 +2,7 @@ package console
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/danielchatfield/go-indicator"
 )
@@ -24,7 +25,26 @@ func NewCommandLogEntry(cmd string, msg string) *CommandLogEntry {
 		done: make(chan struct{}),
 	}
 
+	go func() {
+		for {
+			select {
+			case <-c.done:
+				return
+			case <-time.Tick(100 * time.Millisecond):
+				c.i.Next()
+				c.Refresh()
+			}
+		}
+	}()
+
 	return c
+}
+
+// Refresh sends a refresh signal if a subscriber is attached
+func (c *CommandLogEntry) Refresh() {
+	if c.refresh != nil {
+		c.refresh <- struct{}{}
+	}
 }
 
 // Subscribe sets the refresh event channel so that the console knows when
@@ -38,6 +58,7 @@ func (c *CommandLogEntry) Subscribe(refresh chan struct{}) chan struct{} {
 // from being sent
 func (c *CommandLogEntry) Unsubscribe() {
 	c.refresh = nil
+	close(c.done)
 }
 
 func (c *CommandLogEntry) String() string {
