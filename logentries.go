@@ -70,8 +70,14 @@ func (c *CommandLogEntry) InteractiveString() string {
 	return fmt.Sprintf(" %s  %s  %s", c.i, c.cmd, c.msg)
 }
 
+func (c *CommandLogEntry) terminate() {
+	c.done <- struct{}{}
+	close(c.done)
+	<-time.Tick(time.Millisecond)
+}
+
 // Success changes the indicator to the success indicator then
 func (c *CommandLogEntry) Success() {
 	c.i.Success()
-	close(c.done)
+	c.terminate()
 }
