@@ -60,13 +60,16 @@ func (l *InteractiveConsole) Log(msg interface{}) (n int, err error) {
 			for {
 				select {
 				case <-refresh:
+					fmt.Fprint(l.out, "\r")
 					fmt.Fprint(l.out, imsg.InteractiveString())
 				case <-done:
+					fmt.Fprint(l.out, "\r")
 					fmt.Fprintln(l.out, imsg.InteractiveString())
 					return
 				}
 			}
 		}()
+		return
 
 	}
 	return fmt.Fprintln(l.out, msg)
