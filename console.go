@@ -1,6 +1,10 @@
 package console
 
-import "os"
+import (
+	"os"
+
+	"github.com/danielchatfield/go-console/logentry"
+)
 
 // Status represents the status of the task
 type Status int
@@ -30,4 +34,17 @@ func NewConsole() Console {
 // Log logs using the default console
 func Log(msg interface{}) (n int, err error) {
 	return console.Log(msg)
+}
+
+// LogCommand creates a new CommandLogEntry, logs it and returns it
+func LogCommand(cmd string) *logentry.Command {
+	c := logentry.NewCommand(cmd, "")
+	console.Log(c)
+	return c
+}
+
+// LogSection logs a section header
+func LogSection(str string) {
+	c := logentry.NewSection(str)
+	console.Log(c)
 }
